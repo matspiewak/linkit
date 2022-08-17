@@ -1,16 +1,34 @@
 import { NextPage } from 'next/types';
 import { GetStaticProps, GetStaticPaths } from 'next';
+import getAllUserUsername from '../db/getAllUserUsernames';
+import { prisma } from '../db/client';
+import { Prisma } from '@prisma/client';
 
-const User: NextPage = () => {
-    return <div>yo</div>;
+interface UserData {
+    profile_content: {
+        button: {
+            href: string;
+            title: string;
+        };
+        title: string;
+    };
+}
+
+interface profileProps {
+    profile: UserData;
+}
+
+const User: NextPage<profileProps> = ({ profile }) => {
+    return (
+        <div>
+            <p>{profile.profile_content.title}</p>
+        </div>
+    );
 };
-//! export types to keep them in one place and reference them! Also, https://github.com/vercel/examples/blob/main/solutions/reuse-responses/pages/%5Bid%5D.tsx
 export const getStaticPaths: GetStaticPaths = async () => {
-    const res = await fetch('http://localhost:3000/api/userPaths');
-    const users = await res.json();
-
-    const paths = users.map((user: { username: string }) => ({
-        params: { user: user.username },
+    const users = await getAllUserUsername();
+    const paths = users.map((user) => ({
+        params: { user: user.user_title },
     }));
 
     return {
@@ -19,9 +37,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+    const profile = await prisma.profile.findFirst({
+        where: {
+            user_title: params!.user,
+        },
+        select: {
+            profile_content: true,
+        },
+    });
     return {
-        props: { post: { id: 1 } },
+        props: { profile },
     };
 };
 
