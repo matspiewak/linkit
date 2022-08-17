@@ -10,19 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String         @id @unique
-  createdAt    DateTime       @default(now())
-  username     String         @db.VarChar(20)
-  role         Role           @default(Free)
-  User_Content User_Content[]
+model Account {
+  id            String   @id @unique
+  email         String   @unique @db.VarChar(30)
+  password      String   @db.VarChar(200)
+  active        Boolean  @default(true)
+  refresh_token String?  @db.VarChar(200)
+  Profile       Profile?
 }
 
-model User_Content {
-  id     String @id @unique
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-  body   Json?
+model Profile {
+  id              String   @id @unique
+  account_id      String   @unique
+  user_title      String   @unique
+  createdAt       DateTime @default(now())
+  verified        Boolean  @default(false)
+  profile_content Json?
+  role            Role     @default(Free)
+  account         Account  @relation(fields: [account_id], references: [id])
 }
 
 enum Role {
