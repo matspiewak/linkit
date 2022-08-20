@@ -38,9 +38,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
+    const user = params!.user as string
     const profile = await prisma.profile.findFirst({
         where: {
-            user_title: params!.user,
+            user_title: user,
         },
         select: {
             profile_content: true,
