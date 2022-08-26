@@ -2,26 +2,28 @@ import { NextPage } from 'next/types';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import getAllUserUsername from '../db/getAllUserUsernames';
 import { prisma } from '../db/client';
-import { Prisma } from '@prisma/client';
+import { ProfileProps } from '../types/UserContentTypes';
 
-interface UserData {
-    profile_content: {
-        button: {
-            href: string;
-            title: string;
-        };
-        title: string;
-    };
-}
-
-interface profileProps {
-    profile: UserData;
-}
-
-const User: NextPage<profileProps> = ({ profile }) => {
+const User: NextPage<ProfileProps> = ({ profile }) => {
+    const userButtons = profile.profile_content.buttons;
     return (
         <div>
-            <p>{profile.profile_content.title}</p>
+            <p>{profile.profile_content.page.user}</p>
+            <div>
+                {userButtons.map((button) => {
+                    return (
+                        <button key={button.id}>
+                            <a
+                                href={button.url}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {button.text}
+                            </a>
+                        </button>
+                    );
+                })}
+            </div>
         </div>
     );
 };
@@ -38,7 +40,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-    const user = params!.user as string
+    const user = params!.user as string;
     const profile = await prisma.profile.findFirst({
         where: {
             user_title: user,
