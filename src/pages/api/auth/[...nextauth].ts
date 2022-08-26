@@ -1,12 +1,112 @@
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google";
+import NextAuth, { Account } from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+import { prisma } from '../../../db/client';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
-export default NextAuth({
-  // Configure one or more authentication providers
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET
-    })
-  ]
-})
+type NewAccount =
+    | (Account & {
+          accessTokenExpires: Date;
+          refreshToken: string;
+          expires_in: number;
+          accessToken: string;
+      })
+    | null;
+
+async function refreshAccessToken(userId: string, newAccount: NewAccount) {
+    try {
+        const userAccount = (await prisma.account.findFirst({
+            where: { userId },
+        })) as NewAccount;
+        if (!userAccount) {
+            return;
+        }
+        if (userAccount.accessTokenExpires) {
+            if (new Date() < userAccount.accessTokenExpires) {
+                return;
+            }
+        }
+
+        const refreshToken = userAccount.refreshToken;
+        //                      ^?
+
+        const url =
+            'https://oauth2.googleapis.com/token?' +
+            new URLSearchParams({
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken,
+            });
+
+        const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            method: 'POST',
+        });
+
+        const refreshedTokens = await response.json();
+
+        if (!response.ok) {
+            if (refreshedTokens.error === 'invalid_grant') {
+                await prisma.account.update({
+                    where: { id: userAccount.id as string },
+                    data: {
+                        refreshToken: newAccount.refreshToken,
+                        accessToken: newAccount!.accessToken,
+                        accessTokenExpires: new Date(
+                            Date.now() + newAccount!.expires_in * 1000
+                        ),
+                    },
+                });
+                return;
+            }
+            throw refreshedTokens;
+        }
+
+        await prisma.account.update({
+            where: { id: userAccount.id as string },
+            data: {
+                refreshToken: refreshedTokens.refresh_token ?? refreshToken,
+                accessToken: refreshedTokens.access_token,
+                accessTokenExpires: new Date(
+                    Date.now() + refreshedTokens.expires_in * 1000
+                ),
+            },
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export default NextAuth({ //! access db's refresh token to use it in a google provider url in order to refresh ~30min session
+    providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            authorization: {
+                params: {
+                    prompt: 'consent',
+                    access_type: 'offline',
+                    response_type: 'code',
+                },
+            },
+        }),
+    ],
+    adapter: PrismaAdapter(prisma),
+    events: {
+        async signIn(payload) {
+            await refreshAccessToken(
+                payload.user.id,
+                payload.account as NewAccount
+            );
+        },
+    },
+    // debug: process.env.NODE_ENV === "development",
+    secret: process.env.NEXTAUTH_SECRET,
+    session: {
+        strategy: 'database',
+        updateAge: 0,
+        maxAge: 60 * 60 * 24,
+    },
+});
