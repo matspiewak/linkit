@@ -10,15 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model Account {
-//   id            String   @id @unique
-//   email         String   @unique @db.VarChar(30)
-//   password      String   @db.VarChar(200)
-//   active        Boolean  @default(true)
-//   refresh_token String?  @db.VarChar(200)
-//   Profile       Profile?
-// }
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -54,19 +45,19 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  profile       Profile?  @relation(fields: [profileId], references: [id])
-  profileId     String?   @unique
+  page       Page?  @relation(fields: [pageId], references: [id])
+  pageId     String?   @unique
 }
 
-model Profile {
+model Page {
   id              String   @id @unique
   user_id         String   @unique
   user_title      String   @unique
   createdAt       DateTime @default(now())
-  profile_content Json?
-  role            Role     @default(Free)
+  content Json?
   User            User?
 }
+
 
 model VerificationToken {
   identifier String
@@ -74,9 +65,4 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-enum Role {
-  Free
-  Premium
 }
