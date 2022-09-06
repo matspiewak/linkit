@@ -1,27 +1,32 @@
 import { InferGetStaticPropsType, NextPage } from 'next/types';
-import { GetStaticProps, GetStaticPaths } from 'next';
-import getAllUserUsername from '../db/getAllUserUsernames';
-import { prisma } from '../db/client';
-import { UserProps } from '../types/UserContentTypes';
+import { GetStaticPaths } from 'next';
+import getUserTitles from '../db/getUserTitles';
 import LinkContainer from '../components/LinksContainer';
 import UserContainer from '../components/UserContainer';
 import Toolbar from '../components/Toolbar';
 import Footer from '../components/Footer';
 import Theme from '../components/Theme';
 import Head from 'next/head';
+import getPageBySlug from '../db/getPageBySlug';
+import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 
-const User: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ page }) => {
+function User({ page }: InferGetStaticPropsType<typeof getStaticProps>) {
+
+    if (!page || !page.Profile || !page.Link || !page.LinkStyle) {
+        return <div>Uh oh</div>
+    }
+
     return (
         <>
             <Head>
                 <title>My page title</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
-            <Theme bgColor={page.content.body.style.backgroundColor}>
+            <Theme bgColor={page?.Style?.background_color!}>
                 <Toolbar />
                 <main style={{ width: '100%', height: '100%' }}>
-                    <UserContainer user={page.content.user} />
-                    <LinkContainer links={page.content.links} linkStyle={page.content.body.linkStyle}/>
+                    <UserContainer profile={page.Profile} />
+                    <LinkContainer links={page.Link} linkStyle={page.LinkStyle} />
                 </main>
                 <Footer />
             </Theme>
@@ -30,9 +35,9 @@ const User: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ page }
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const users = await getAllUserUsername();
+    const users = await getUserTitles();
     const paths = users.map((user) => ({
-        params: { user: user.user_title },
+        params: { user: user.title },
     }));
 
     return {
@@ -41,20 +46,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-export const getStaticProps: GetStaticProps<UserProps> = async ({ params }) => {
-    const user = params!.user as string;
-    const res = await prisma.page.findFirst({
-        where: {
-            user_title: user,
-        },
-        select: {
-            id: true,
-            content: true,
-        },
-    })//! fix profile props type
+export const getStaticProps = async (context: any) => {
+    const user = context.params!.user as string;
+    const page = await getPageBySlug('/' + user);
 
     return {
-        props: { page: res },
+        props: { page },
     };
 };
 
