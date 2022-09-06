@@ -1,12 +1,11 @@
 import { Prisma } from '@prisma/client';
-import { prisma } from '../db/client';
+import { prisma } from './client';
 
-const getAllUserUsernames = async () => {
+const getUserTitles = async () => {
     try {
-        const users = await prisma.page.findMany({
+        const users = await prisma.profile.findMany({
             select: {
-                id: true,
-                user_title: true,
+                title: true,
             },
         });
 
@@ -24,4 +23,4 @@ const getAllUserUsernames = async () => {
     }
 };
 
-export default getAllUserUsernames;
+export default getUserTitles;
