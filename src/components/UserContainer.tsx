@@ -1,15 +1,16 @@
+import { Prisma } from "@prisma/client"
 import styled from "styled-components"
 import { User } from '../types/UserContentTypes'
 
 /* eslint-disable @next/next/no-img-element */
-const UserContainer = ({ user }: { user: User }) => {
+const UserContainer = ({ profile }: { profile: Prisma.ProfileGetPayload<{ select: { title: true, bio: true, image: true } }> }) => {
     return (
         <Container>
-            <img alt="user profile picture" src={user.profilePicture} loading={'lazy'}
+            <img alt="user profile picture" src={profile.image}
                 style={{ width: '120px', height: '120px', objectFit: 'cover', objectPosition: 'top left', borderRadius: '50%' }}
             />
-            <UserName>{user.title}</UserName>
-            <UserBio>{user.bio}</UserBio>
+            <UserName>{profile.title}</UserName>
+            <UserBio>{profile.bio}</UserBio>
         </Container>
     )
 }
