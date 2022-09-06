@@ -1,27 +1,42 @@
-import { Link } from "../types/UserContentTypes";
 import styled from 'styled-components'
+import { Link, LinkStyle } from '../types/UserContentTypes';
 
 
-const Link = ({ link, linkStyle }: { link: Link, linkStyle: any }) => {
+const Link = ({ link, linkStyle }: { link: Link, linkStyle: LinkStyle }) => {
+    console.log(linkStyle.radius)
     return (
-        <StyledLink linkStyle={linkStyle} >
+        // @ts-ignore
+        <StyledLink linkStyle={linkStyle}>
             <StyledAnchor href={link.url} target="_blank" rel="noreferrer">
                 {link.text}
             </StyledAnchor>
         </StyledLink>
     )
 }
-
+// @ts-ignore
 const StyledLink = styled.div`
     width: 100%;
     max-width: 600px;
     height: 50px;
     padding: 0.25em;
-    background-color: ${props => props.linkStyle.backgroundColor};
-    color: ${props => props.linkStyle.font.color};
-    font-weight: ${props => props.linkStyle.font.bold}
-    border-radius: ${props => props.linkStyle.borderRadius}px;
-    border: ${props => props.linkStyle.border}
+    background-color: ${props =>
+        // @ts-ignore
+        props.linkStyle.background_color};
+    color: ${props =>
+        // @ts-ignore
+        props.linkStyle.font_color};
+    font-weight: ${props =>
+        // @ts-ignore
+        props.linkStyle.font_weight};
+    border-radius: ${props =>
+        // @ts-ignore
+        props.linkStyle.radius};
+    border: ${props =>
+        // @ts-ignore
+        props.linkStyle.border};
+    box-shadow: ${props =>
+        // @ts-ignore
+        props.linkStyle.shadow};
 `;
 
 const StyledAnchor = styled.a`
