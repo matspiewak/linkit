@@ -45,19 +45,73 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  page       Page?  @relation(fields: [pageId], references: [id])
-  pageId     String?   @unique
+  page          Page?     @relation(fields: [pageId], references: [id])
+  pageId        String?   @unique
 }
 
 model Page {
-  id              String   @id @unique
-  user_id         String   @unique
-  user_title      String   @unique
-  createdAt       DateTime @default(now())
-  content Json?
-  User            User?
+  id            String     @id @default(cuid())
+  user_id       String     @unique
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  User          User?
+  LinkStyle     LinkStyle?
+  link_style_id String?    @unique
+  Style         Style?
+  style_id      String?    @unique
+  Profile       Profile?
+  profile_id    String?    @unique
+  Link          Link[]
+  slug          String     @unique
 }
 
+model Style {
+  id               String   @id @default(cuid())
+  page_id          String   @unique
+  page             Page     @relation(fields: [page_id], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt
+  background_color String   @default("#ffffff")
+  effect           String   @default("coming soon")
+}
+
+model LinkStyle {
+  id               String   @id @default(cuid())
+  page_id          String   @unique
+  page             Page     @relation(fields: [page_id], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt
+  border           String   @default("4px black solid")
+  radius           String   @default("0px")
+  shadow           String   @default("0px 0px 0px black")
+  background_color String   @default("#ffffff")
+  font_color       String   @default("#000000")
+  font_size        String   @default("16px")
+  font_family      String   @default("sans-serif")
+  font_weight      String   @default("normal")
+  font_style       String   @default("normal")
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  page_id   String
+  page      Page     @relation(fields: [page_id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  text      String
+  url       String
+  icon      String
+  order     Int
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  title  String @unique
+  bio    String
+  image  String
+  page   Page?  @relation(fields: [pageId], references: [id])
+  pageId String @unique
+}
 
 model VerificationToken {
   identifier String
