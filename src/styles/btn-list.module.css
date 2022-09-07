@@ -1,7 +1,7 @@
-.btn_list{
-    margin-top: 5em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1em;
+.btn_list {
+	margin-top: 2.8em;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.5em;
 }

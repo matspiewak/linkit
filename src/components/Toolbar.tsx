@@ -1,17 +1,12 @@
-import styled from "styled-components"
+import styled from 'styled-components';
 
 const Toolbar = () => {
-
-    return (
-        <Header>
-            {' '}
-        </Header>
-    )
-}
+	return <Header> </Header>;
+};
 
 const Header = styled.header`
-    width: 100%;
-    height: 4em;
-`
+	width: 100%;
+	height: 3em;
+`;
 
-export default Toolbar
+export default Toolbar;

@@ -1,6 +1,5 @@
 import Link from './Link'
 import styles from '../styles/btn-list.module.css'
-import { Prisma } from "@prisma/client";
 import { Link as LinkType, LinkStyle } from "../types/UserContentTypes";
 
 
