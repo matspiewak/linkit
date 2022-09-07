@@ -100,8 +100,9 @@ model Link {
   updatedAt DateTime @default(now()) @updatedAt
   text      String
   url       String
-  icon      String
+  icon      String   @db.LongText
   order     Int
+  visible   Boolean  @default(true)
 }
 
 model Profile {

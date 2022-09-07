@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `Link` ADD COLUMN `visible` BOOLEAN NOT NULL DEFAULT true,
+    MODIFY `icon` LONGTEXT NOT NULL;
