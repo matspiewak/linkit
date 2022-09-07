@@ -8,21 +8,20 @@ import Footer from '../components/Footer';
 import Theme from '../components/Theme';
 import Head from 'next/head';
 import getPageBySlug from '../db/getPageBySlug';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 
 function User({ page }: InferGetStaticPropsType<typeof getStaticProps>) {
 
-    if (!page || !page.Profile || !page.Link || !page.LinkStyle) {
+    if (!page || !page.Profile || !page.Link || !page.LinkStyle || !page.Style) {
         return <div>Uh oh</div>
     }
 
     return (
         <>
             <Head>
-                <title>My page title</title>
+                <title>{'@' + page.Profile.title + ' | LinkIt'}</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
-            <Theme bgColor={page?.Style?.background_color!}>
+            <Theme bgColor={page.Style.background_color!}>
                 <Toolbar />
                 <main style={{ width: '100%', height: '100%' }}>
                     <UserContainer profile={page.Profile} />
