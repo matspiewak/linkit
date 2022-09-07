@@ -12,6 +12,8 @@ function Dashboard({
 	page,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	const [links, setLinks] = useState<Link[]>(page?.Link! || []);
+	const [refresh, setRefresh] = useState<number>(0);
+	console.log(refresh);
 
 	if (!page || !page.Profile) {
 		return <div>sds</div>;
@@ -24,7 +26,7 @@ function Dashboard({
 			</nav>
 			<main className={styled.body_container}>
 				<section className={styled.section}>
-					<LinkCardContainer links={links} />
+					<LinkCardContainer links={links} setRefresh={setRefresh} />
 				</section>
 				<section className={styled.section}>
 					<iframe
@@ -32,6 +34,7 @@ function Dashboard({
 						src={page.slug}
 						height='100%'
 						width='95%'
+						key={refresh}
 					/>
 				</section>
 			</main>

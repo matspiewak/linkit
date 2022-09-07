@@ -5,16 +5,19 @@ interface IState {
 	text: string;
 	url: string;
 }
-
-function LinkCard({ link }: any) {
+//! TODO MIGRATE CHECK VISIBLE
+function LinkCard({ link, setRefresh }: any) {
 	const [linkInputs, setLinkInputs] = useState<IState>({
 		text: link.text,
 		url: link.url,
 	});
-	const [isEdited, setIsEdited] = useState({linkId: link.id, isEdited: false});
+	const [isEdited, setIsEdited] = useState({
+		linkId: link.id,
+		isEdited: false,
+	});
 	const [icon, setIcon] = useState<string>('');
-	const [isVisible, setIsVisible] = useState<boolean>(true);
-	const [position, setPosition] = useState<number>(0);
+	const [visible, setVisible] = useState<boolean>(link.visible);
+	const [order, setOrder] = useState<number>(0);
 
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const name = e.target.name;
@@ -22,12 +25,20 @@ function LinkCard({ link }: any) {
 			...linkInputs,
 			[name]: e.target.value,
 		});
-
 	};
 	const handleSubmit = (e: SubmitEvent) => {
 		e.preventDefault();
-		// setLinks([...links, { text: linkInputs.text, url: linkInputs.url, icon: icon, isVisible: isVisible, position: position }])
-		setLinkInputs({ text: '', url: '' });
+		fetch('/api/update', {
+			method: 'POST',
+			body: JSON.stringify({
+				id: link.id,
+				text: linkInputs.text,
+				url: linkInputs.url,
+				visible: visible,
+				icon: icon,
+			}),
+		});
+		setRefresh(prevValue => prevValue + 1);
 	};
 
 	return (
@@ -56,6 +67,7 @@ function LinkCard({ link }: any) {
 						onChange={e => handleInputChange(e)}
 						onClick={e => e.currentTarget.select()}
 					/>
+					<button type='submit'>Submit</button>
 				</form>
 				<div></div>
 			</div>
@@ -63,8 +75,8 @@ function LinkCard({ link }: any) {
 				<label className={styled.switch}>
 					<input
 						type='checkbox'
-						checked={isVisible}
-						onChange={() => setIsVisible(!isVisible)}
+						checked={visible}
+						onChange={() => setVisible(!visible)}
 					/>
 					<span className={styled.slider + ' ' + styled.round}></span>
 				</label>

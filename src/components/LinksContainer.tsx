@@ -3,7 +3,8 @@ import LinkList from "./LinkList";
 
 
 const LinkContainer = ({ links, linkStyle }: { links: Link[], linkStyle: LinkStyle }) => {
-    const userLinks = links.sort((a, b) => a.order - b.order);
+    const filteredList = links.filter(link => link.visible !== false);
+    const userLinks = filteredList.sort((a, b) => a.order - b.order);
 
     return (
         <div>

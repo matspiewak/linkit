@@ -15,6 +15,7 @@ const getPageBySlug = async (slug: string) => {
                     url: true,
                     icon: true,
                     order: true,
+                    visible: true
                 },
             },
             Profile: {

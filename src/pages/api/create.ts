@@ -6,21 +6,25 @@ import { prisma } from '../../db/client';
 export default async (req: any, res: any) => {
 	const session = await unstable_getServerSession(req, res, authOptions);
 
+	const createLink = () => {};
+
 	if (session) {
-		const { id, text, url, visible, icon } = JSON.parse(req.body);
-		console.log(id, text, url, visible, icon);
+		// Signed in
+		console.log('Session', JSON.stringify(session, null, 2));
+
 		await prisma?.link
-			.update({
-				where: { id: id },
+			.create({
 				data: {
-					text,
-					url,
-					visible,
-					icon,
+					text: req.body.text,
+					url: req.body.url,
+					icon: req.body.icon,
+					order: req.body.order,
+					page_id: req.body.page_id,
 				},
 			})
 			.catch(err => res.status(500).json({ message: err.message }));
 	} else {
+		// Not Signed in
 		res.status(401);
 	}
 	res.end();
