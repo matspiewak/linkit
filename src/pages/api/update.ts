@@ -1,9 +1,10 @@
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import { prisma } from '../../db/client';
+import { NextApiRequest, NextApiResponse } from 'next/types';
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default async (req: any, res: any) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
 	const session = await unstable_getServerSession(req, res, authOptions);
 
 	if (session) {

@@ -26,7 +26,7 @@ function Dashboard({
 			</nav>
 			<main className={styled.body_container}>
 				<section className={styled.section}>
-					<LinkCardContainer links={links} setRefresh={setRefresh} />
+					<LinkCardContainer links={links} setRefresh={setRefresh} slug={page.slug}/>
 				</section>
 				<section className={styled.section}>
 					<iframe

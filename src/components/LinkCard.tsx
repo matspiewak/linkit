@@ -6,7 +6,7 @@ interface IState {
 	url: string;
 }
 //! TODO MIGRATE CHECK VISIBLE
-function LinkCard({ link, setRefresh }: any) {
+function LinkCard({ link, setRefresh, slug }: any) {
 	const [linkInputs, setLinkInputs] = useState<IState>({
 		text: link.text,
 		url: link.url,
@@ -37,8 +37,15 @@ function LinkCard({ link, setRefresh }: any) {
 				visible: visible,
 				icon: icon,
 			}),
+		}).then(() => {
+			fetch(
+				//!probably the session should contain the slug so only owner can revalidate
+				`/api/revalidate?title=${slug}`
+			);
 		});
-		setRefresh(prevValue => prevValue + 1);
+		setTimeout(() => {
+			setRefresh((prevValue: number) => prevValue + 1);
+		}, 500);
 	};
 
 	return (
@@ -47,7 +54,7 @@ function LinkCard({ link, setRefresh }: any) {
 			<div>
 				<form
 					className={styled.card_form}
-					onSubmit={e => handleSubmit(e)}
+					onSubmit={(e: any) => handleSubmit(e)}
 				>
 					<input
 						className={
