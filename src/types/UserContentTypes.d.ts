@@ -1,6 +1,16 @@
+import { Prisma } from '@prisma/client';
+
 export type Link = Prisma.LinkGetPayload<{
-	select: { icon: true; order: true; text: true; url: true; id: true };
+	select: {
+		icon: true;
+		order: true;
+		text: true;
+		url: true;
+		id: true;
+		visible: true;
+	};
 }>;
+
 export type LinkStyle = Prisma.LinkStyleGetPayload<{
 	select: {
 		id: true;
