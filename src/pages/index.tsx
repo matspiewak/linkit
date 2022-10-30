@@ -3,30 +3,24 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { useEffect } from 'react';
 
 const Home: NextPage = () => {
-    const { data: session } = useSession();
-
-    useEffect(() => {
-        if (session?.error === 'RefreshAccessTokenError') {
-            signIn(); // Force sign in to hopefully resolve error
-        }
-    }, [session]);
-
-    if (session) {
-        return (
-            <>
-                Signed in as {session.user!.email} <br />
-                <button onClick={() => signOut()}>Sign out</button>
-                <div></div>
-                {session.expires}
-            </>
-        );
-    }
-    return (
-        <>
-            Not signed in <br />
-            <button onClick={() => signIn()}>Sign in</button>
-        </>
-    );
+	const { data: session } = useSession();
+	console.log(session);
+	if (session) {
+		return (
+			<>
+				Signed in as {session.user!.email} <br />
+				<button onClick={() => signOut()}>Sign out</button>
+				<div></div>
+				{session.expires}
+			</>
+		);
+	}
+	return (
+		<>
+			Not signed in <br />
+			<button onClick={() => signIn()}>Sign in</button>
+		</>
+	);
 };
 
 export default Home;

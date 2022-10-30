@@ -3,7 +3,6 @@ import { InferGetServerSidePropsType } from 'next/types';
 import { authOptions } from '../api/auth/[...nextauth]';
 import { useState } from 'react';
 import getPageByUserId from '../../db/getPageByUserId';
-import { Link } from '../../types/UserContentTypes';
 import LinkCardContainer from '../../components/LinkCardContainer';
 import styled from '../../styles/dashboard.module.css';
 
@@ -11,12 +10,29 @@ function Dashboard({
 	session,
 	page,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-	const [links, setLinks] = useState<Link[]>(page?.Link! || []);
+	//! move links to linkscontainer, do i really need shared state here?
 	const [refresh, setRefresh] = useState<number>(0);
-	console.log(refresh);
+	const [title, setTitle] = useState<string>(page?.Profile?.title! || '');
 
 	if (!page || !page.Profile) {
-		return <div>sds</div>;
+		const handleClick = async () => {
+			fetch('/api/new/page', {
+				method: 'POST',
+				body: JSON.stringify({ title: title }),
+			});
+		};
+
+		return (
+			<div>
+				<input
+					type='text'
+					placeholder='title'
+					value={title}
+					onChange={e => setTitle(e.target.value)}
+				/>
+				<button onClick={handleClick}>newPage</button>
+			</div>
+		);
 	}
 
 	return (
@@ -26,7 +42,11 @@ function Dashboard({
 			</nav>
 			<main className={styled.body_container}>
 				<section className={styled.section}>
-					<LinkCardContainer links={links} setRefresh={setRefresh} slug={page.slug}/>
+					<LinkCardContainer
+						setRefresh={setRefresh}
+						slug={page.slug}
+						pageLinks={page.Link}
+					/>
 				</section>
 				<section className={styled.section}>
 					<iframe
@@ -56,14 +76,14 @@ export async function getServerSideProps(context: any) {
 	);
 
 	//! commented, because i need type saftety more than i need this for now
-	// if (!session?.user) {
-	//     return {
-	//         redirect: {
-	//             destination: '/',
-	//             permanent: false,
-	//         },
-	//     }
-	// }
+	if (!session?.user) {
+		return {
+			redirect: {
+				destination: '/',
+				permanent: false,
+			},
+		};
+	}
 
 	const page = await getPageByUserId(session?.user.id);
 
