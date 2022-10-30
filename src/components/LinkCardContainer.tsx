@@ -1,23 +1,73 @@
-import { Link } from '../types/UserContentTypes';
+import { Dispatch, SetStateAction, useReducer, useState } from 'react';
 import LinkCard from './LinkCard';
+import { DndContext, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
+import { CustomMouseSensor, CustomKeyboardSensor } from '../helpers/dnd-kitCustomSensors';
+import {
+	SortableContext,
+	sortableKeyboardCoordinates,
+	verticalListSortingStrategy,
+	arrayMove,
+} from '@dnd-kit/sortable';
+import { DragEndEvent, DragStartEvent } from '@dnd-kit/core/dist/types';
+import { Link } from '../types/UserContentTypes';
+import Draggable from './Draggable';
+import styled from '../styles/LinkCardContainer.module.css';
 
-function LinkCardContainer({ links, setRefresh, slug }: any) {
-	const sortedLinks = links.sort(
-		(a: { order: number }, b: { order: number }) => a.order - b.order
+interface IProps {
+	pageLinks: Link[];
+	setRefresh: Dispatch<SetStateAction<number>>;
+	slug: string;
+}
+//! fix keyboard sensor or nah idk
+function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
+	const [links, setLinks] = useState<Link[]>(pageLinks);
+
+	const sensors = useSensors(
+		useSensor(CustomMouseSensor),
+		useSensor(CustomKeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		})
 	);
-
 	return (
-		<div>
-			{sortedLinks.map((link: any) => (
-				<LinkCard
-					key={link.id}
-					link={link}
-					setRefresh={setRefresh}
-					slug={slug}
-				/>
-			))}
-		</div>
+		<DndContext
+			sensors={sensors}
+			collisionDetection={closestCenter}
+			onDragEnd={handleDragEnd}
+			onDragStart={handleDragStart}
+		>
+			<SortableContext items={links} strategy={verticalListSortingStrategy}>
+				<div className={styled.container}>
+					<button>New Link</button>
+					{links.map((link: Link) => (
+						<Draggable key={link.id} elementId={link.id}>
+							<LinkCard link={link} setRefresh={setRefresh} slug={slug} />
+						</Draggable>
+					))}
+				</div>
+			</SortableContext>
+		</DndContext>
 	);
+
+	function handleDragEnd(e: DragEndEvent) {
+		const { active, over } = e;
+		console.log(e);
+
+		const oldIndex = links.findIndex(link => link.id === active.id);
+		const newIndex = links.findIndex(link => link.id === over?.id);
+
+		if (over !== null && active.id !== over.id) {
+			setLinks(
+				arrayMove(links, oldIndex, newIndex).map((link, index) => ({
+					...link,
+					order: index,
+				}))
+			);
+		}
+	}
+
+	function handleDragStart(e: DragStartEvent) {
+		console.log(e);
+	}
 }
 
 export default LinkCardContainer;

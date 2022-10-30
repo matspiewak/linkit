@@ -1,69 +1,43 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState } from 'react';
 import styled from '../styles/link-card.module.css';
+import { Link } from '../types/UserContentTypes';
+import React from 'react';
 
-interface IState {
-	text: string;
-	url: string;
+interface IProps {
+	link: Link;
+	setRefresh: Dispatch<SetStateAction<number>>;
+	slug: string;
 }
 //! TODO MIGRATE CHECK VISIBLE
-function LinkCard({ link, setRefresh, slug }: any) {
-	const [linkInputs, setLinkInputs] = useState<IState>({
-		text: link.text,
-		url: link.url,
-	});
+//! state is being reset because of useState is binded to the component position in the DOM, not the component itself
+//? lift state up to the parent component?
+function LinkCard({ link, setRefresh, slug }: IProps) {
 	const [isEdited, setIsEdited] = useState({
 		linkId: link.id,
 		isEdited: false,
 	});
+	const [linkInputs, setLinkInputs] = useState<{ text: string; url: string }>({
+		text: link.text,
+		url: link.url,
+	});
+
 	const [icon, setIcon] = useState<string>('');
 	const [visible, setVisible] = useState<boolean>(link.visible);
-	const [order, setOrder] = useState<number>(0);
-
-	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const name = e.target.name;
-		setLinkInputs({
-			...linkInputs,
-			[name]: e.target.value,
-		});
-	};
-	const handleSubmit = (e: SubmitEvent) => {
-		e.preventDefault();
-		fetch('/api/update', {
-			method: 'POST',
-			body: JSON.stringify({
-				id: link.id,
-				text: linkInputs.text,
-				url: linkInputs.url,
-				visible: visible,
-				icon: icon,
-			}),
-		}).then(() => {
-			fetch(
-				//!probably the session should contain the slug so only owner can revalidate
-				`/api/revalidate?title=${slug}`
-			);
-		});
-		setTimeout(() => {
-			setRefresh((prevValue: number) => prevValue + 1);
-		}, 500);
-	};
 
 	return (
 		<div className={styled.card}>
-			<div></div>
+			<div style={{ width: '20px', backgroundColor: 'red' }} data-dnd='true'></div>
 			<div>
-				<form
-					className={styled.card_form}
-					onSubmit={(e: any) => handleSubmit(e)}
-				>
+				<form className={styled.card_form} onSubmit={handleSubmit}>
+					{
+						//! add isEditing state to set text and url values to <p> while its true, instad of keeping them as inputs
+					}
 					<input
-						className={
-							styled.interactable_input + ' ' + styled.text
-						}
+						className={styled.interactable_input + ' ' + styled.text}
 						type='text'
 						value={linkInputs.text}
 						name='text'
-						onChange={e => handleInputChange(e)}
+						onChange={handleInputChange}
 						onClick={e => e.currentTarget.select()}
 					/>
 					<input
@@ -71,7 +45,7 @@ function LinkCard({ link, setRefresh, slug }: any) {
 						type='text'
 						value={linkInputs.url}
 						name='url'
-						onChange={e => handleInputChange(e)}
+						onChange={handleInputChange}
 						onClick={e => e.currentTarget.select()}
 					/>
 					<button type='submit'>Submit</button>
@@ -83,13 +57,31 @@ function LinkCard({ link, setRefresh, slug }: any) {
 					<input
 						type='checkbox'
 						checked={visible}
-						onChange={() => setVisible(!visible)}
+						onChange={() => {
+							setVisible(!visible);
+						}}
 					/>
 					<span className={styled.slider + ' ' + styled.round}></span>
 				</label>
 			</div>
 		</div>
 	);
+
+	function handleEdit(link: Link) {
+		// dispatch({ type: 'EDIT_LINK_CARD', linkCard });
+	} //? reducer is probably good idea here
+	function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+		const name = e.target.name;
+		setLinkInputs({
+			...linkInputs,
+			[name]: e.target.value,
+		});
+	}
+	function handleSubmit(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		// dispatch({ type: 'test' });
+		//!probably the session should contain the slug so only owner can revalidate
+	}
 }
 
 export default LinkCard;
