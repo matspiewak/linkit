@@ -1,6 +1,6 @@
 import { unstable_getServerSession } from 'next-auth/next';
-import { authOptions } from './auth/[...nextauth]';
-import { prisma } from '../../db/client';
+import { authOptions } from '../auth/[...nextauth]';
+import { prisma } from '../../../db/client';
 import { NextApiRequest, NextApiResponse } from 'next/types';
 
 // eslint-disable-next-line import/no-anonymous-default-export
