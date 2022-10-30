@@ -7,13 +7,12 @@ const Link = ({ link, linkStyle }: { link: Link; linkStyle: LinkStyle }) => {
 		// @ts-ignore
 		<StyledLink linkStyle={linkStyle}>
 			<StyledAnchor href={link.url} target='_blank' rel='noreferrer'>
-				<Image
-					src={'/icons/' + link.icon}
+				{link.icon && <Image
+					src={link.icon}
 					height='24px'
 					width='24px'
 					alt={link.icon}
-					style={{}}
-				/>
+				/>}
 				<span>{link.text}</span>
 			</StyledAnchor>
 		</StyledLink>
@@ -44,6 +43,15 @@ const StyledLink = styled.div`
 	box-shadow: ${props =>
 		// @ts-ignore
 		props.linkStyle.shadow};
+
+	&:hover {
+		transform: translate(4px, 4px);
+		box-shadow: rgb(0 0 0) 6px 6px 0px 0px;
+	}
+	&:active {
+		transform: translate(7.5px, 7.5px);
+		box-shadow: rgb(0 0 0) 2.5px 2.5px 0px 0px;
+	}
 `;
 
 const StyledAnchor = styled.a`
