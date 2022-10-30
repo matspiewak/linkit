@@ -1,5 +1,5 @@
 .page {
-	height: 100vh;
+	min-height: 100vh;
 }
 
 .navbar {
@@ -16,7 +16,15 @@
 	justify-content: space-around;
 	align-items: center;
 	width: 100%;
-	height: calc(100% - 4em);
+	height: calc(100vh - 4em);
+}
+
+.section {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
 }
 
 .frame {
