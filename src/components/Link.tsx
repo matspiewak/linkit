@@ -7,12 +7,15 @@ const Link = ({ link, linkStyle }: { link: Link; linkStyle: LinkStyle }) => {
 		// @ts-ignore
 		<StyledLink linkStyle={linkStyle}>
 			<StyledAnchor href={link.url} target='_blank' rel='noreferrer'>
-				{link.icon && <Image
+				{
+					//!TODO restore Next Image after upload support is added
+					/* {link.icon && <Image
 					src={link.icon}
 					height='24px'
 					width='24px'
 					alt={link.icon}
-				/>}
+				/>} */
+				}
 				<span>{link.text}</span>
 			</StyledAnchor>
 		</StyledLink>

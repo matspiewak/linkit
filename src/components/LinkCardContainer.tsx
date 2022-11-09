@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useReducer, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import LinkCard from './LinkCard';
 import { DndContext, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
 import { CustomMouseSensor, CustomKeyboardSensor } from '../helpers/dnd-kitCustomSensors';
@@ -8,7 +8,7 @@ import {
 	verticalListSortingStrategy,
 	arrayMove,
 } from '@dnd-kit/sortable';
-import { DragEndEvent, DragStartEvent } from '@dnd-kit/core/dist/types';
+import { DragEndEvent } from '@dnd-kit/core/dist/types';
 import { Link } from '../types/UserContentTypes';
 import Draggable from './Draggable';
 import styled from '../styles/LinkCardContainer.module.css';
@@ -33,11 +33,10 @@ function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
 			sensors={sensors}
 			collisionDetection={closestCenter}
 			onDragEnd={handleDragEnd}
-			onDragStart={handleDragStart}
 		>
 			<SortableContext items={links} strategy={verticalListSortingStrategy}>
 				<div className={styled.container}>
-					<button>New Link</button>
+					<button className={styled.newLinkCard}>New Link</button>
 					{links.map((link: Link) => (
 						<Draggable key={link.id} elementId={link.id}>
 							<LinkCard link={link} setRefresh={setRefresh} slug={slug} />
@@ -50,7 +49,6 @@ function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
 
 	function handleDragEnd(e: DragEndEvent) {
 		const { active, over } = e;
-		console.log(e);
 
 		const oldIndex = links.findIndex(link => link.id === active.id);
 		const newIndex = links.findIndex(link => link.id === over?.id);
@@ -63,10 +61,6 @@ function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
 				}))
 			);
 		}
-	}
-
-	function handleDragStart(e: DragStartEvent) {
-		console.log(e);
 	}
 }
 
