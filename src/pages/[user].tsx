@@ -21,19 +21,13 @@ function User({ page }: any) {
 		<>
 			<Head>
 				<title>{'@' + page.Profile.title + ' | LinkIt'}</title>
-				<meta
-					name='viewport'
-					content='initial-scale=1.0, width=device-width'
-				/>
+				<meta name='viewport' content='initial-scale=1.0, width=device-width' />
 			</Head>
 			<Theme bgColor={page.Style.background_color!}>
 				<Toolbar />
 				<main style={{ width: '100%', height: '100%' }}>
 					<UserContainer profile={page.Profile} />
-					<LinkContainer
-						links={page.Link}
-						linkStyle={page.LinkStyle}
-					/>
+					<LinkContainer links={page.Link} linkStyle={page.LinkStyle} />
 				</main>
 				<Footer />
 			</Theme>
@@ -43,14 +37,13 @@ function User({ page }: any) {
 
 export const getStaticPaths: GetStaticPaths = async () => {
 	const users = await getUserTitles();
-	console.log('users?', users);
 	const paths = users.map(user => ({
 		params: { user: user.title },
 	}));
 
 	return {
 		paths,
-		fallback: true, //? I guess it works, but i have to do something with "No page message from if statement"
+		fallback: 'blocking', //? I guess it works, but i have to do something with "No page message from if statement"
 	};
 };
 

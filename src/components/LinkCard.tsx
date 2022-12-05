@@ -7,7 +7,7 @@ import { useOutsideClick } from '../hooks/useOutsideClick';
 
 interface IProps {
 	link: Link;
-	setRefresh: Dispatch<SetStateAction<number>>;
+	setRefresh: SetStateAction<number>;
 	slug: string;
 }
 interface InputProps {

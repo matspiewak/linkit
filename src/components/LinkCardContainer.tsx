@@ -12,15 +12,16 @@ import { DragEndEvent } from '@dnd-kit/core/dist/types';
 import { Link } from '../types/UserContentTypes';
 import Draggable from './Draggable';
 import styled from '../styles/LinkCardContainer.module.css';
+import patchLinkOrder from '../db/patchLinkOrder';
 
 interface IProps {
 	pageLinks: Link[];
-	setRefresh: Dispatch<SetStateAction<number>>;
+	setRefresh: any;
 	slug: string;
 }
 //! fix keyboard sensor or nah idk
 function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
-	const [links, setLinks] = useState<Link[]>(pageLinks);
+	const [links, setLinks] = useState<Link[]>(() => pageLinks.sort((a, b) => a.order - b.order));
 
 	const sensors = useSensors(
 		useSensor(CustomMouseSensor),
@@ -29,11 +30,7 @@ function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
 		})
 	);
 	return (
-		<DndContext
-			sensors={sensors}
-			collisionDetection={closestCenter}
-			onDragEnd={handleDragEnd}
-		>
+		<DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
 			<SortableContext items={links} strategy={verticalListSortingStrategy}>
 				<div className={styled.container}>
 					<button className={styled.newLinkCard}>New Link</button>
@@ -47,12 +44,12 @@ function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
 		</DndContext>
 	);
 
-	function handleDragEnd(e: DragEndEvent) {
+	async function handleDragEnd(e: DragEndEvent) {
 		const { active, over } = e;
 
 		const oldIndex = links.findIndex(link => link.id === active.id);
 		const newIndex = links.findIndex(link => link.id === over?.id);
-
+		
 		if (over !== null && active.id !== over.id) {
 			setLinks(
 				arrayMove(links, oldIndex, newIndex).map((link, index) => ({
@@ -60,6 +57,14 @@ function LinkCardContainer({ setRefresh, slug, pageLinks }: IProps) {
 					order: index,
 				}))
 			);
+			fetch('/api/reorder', {
+				method: 'POST',
+				body: JSON.stringify({ id: active.id, oldIndex, newIndex }),
+			})
+				.then(() => {
+					fetch(`/api/revalidate?title=${slug}`);
+				})
+				.then(() => setRefresh(Math.random()));
 		}
 	}
 }

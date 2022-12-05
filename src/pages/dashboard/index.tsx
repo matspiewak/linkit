@@ -6,10 +6,7 @@ import getPageByUserId from '../../db/getPageByUserId';
 import LinkCardContainer from '../../components/LinkCardContainer';
 import styled from '../../styles/dashboard.module.css';
 
-function Dashboard({
-	session,
-	page,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function Dashboard({ session, page }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	//! move links to linkscontainer, do i really need shared state here?
 	const [refresh, setRefresh] = useState<number>(0);
 	const [title, setTitle] = useState<string>(page?.Profile?.title! || '');
@@ -24,12 +21,7 @@ function Dashboard({
 
 		return (
 			<div>
-				<input
-					type='text'
-					placeholder='title'
-					value={title}
-					onChange={e => setTitle(e.target.value)}
-				/>
+				<input type='text' placeholder='title' value={title} onChange={e => setTitle(e.target.value)} />
 				<button onClick={handleClick}>newPage</button>
 			</div>
 		);
@@ -42,20 +34,10 @@ function Dashboard({
 			</nav>
 			<main className={styled.body_container}>
 				<section className={styled.section}>
-					<LinkCardContainer
-						setRefresh={setRefresh}
-						slug={page.slug}
-						pageLinks={page.Link}
-					/>
+					<LinkCardContainer setRefresh={setRefresh} slug={page.slug} pageLinks={page.Link} />
 				</section>
 				<section className={styled.section}>
-					<iframe
-						className={styled.frame}
-						src={page.slug}
-						height='100%'
-						width='95%'
-						key={refresh}
-					/>
+					<iframe className={styled.frame} src={page.slug} height='100%' width='95%' key={refresh} />
 				</section>
 			</main>
 		</div>
@@ -69,11 +51,8 @@ interface IState {
 
 //! fetched sessions requires all cookies, so i have to find some function that requires it and check if i can make it STAHP
 export async function getServerSideProps(context: any) {
-	const session = await unstable_getServerSession(
-		context.req,
-		context.res,
-		authOptions
-	);
+	context.res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59');
+	const session = await unstable_getServerSession(context.req, context.res, authOptions);
 
 	//! commented, because i need type saftety more than i need this for now
 	if (!session?.user) {

@@ -3,7 +3,6 @@
 	grid-template-rows: 1fr;
 	grid-template-columns: 0.2fr 2fr 0.5fr;
 	background-color: white;
-	font-size: 18px;
 	width: 450px;
 	height: 120px;
 	margin: 0;
@@ -35,6 +34,12 @@
 .contentContainer > form > * {
 	margin: 0;
 	line-height: 24px;
+}
+
+.contentContainer > form > p:nth-child(2) {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: 30ch;
 }
 
 .contentContainer > form > p,
